@@ -1,0 +1,252 @@
+/* =========================
+   FONTS
+========================= */
+
+/* Noto Sans via Google Fonts */
+@import url('https://fonts.googleapis.com/css2?family=Noto+Sans:wght@300;400;600;700&display=swap');
+
+/* Renos Rough (plaats font in assets/fonts/) */
+@font-face {
+    font-family: 'RenosRough';
+    src: url('../fonts/Renos-Rough.ttf') format('truetype');
+    font-weight: normal;
+    font-style: normal;
+}
+
+
+/* =========================
+   ROOT VARIABLES
+========================= */
+
+:root {
+    --orange: #ff7520;
+    --light-orange: #ffb181;
+    --green: #8cd003;
+    --light-green: #deff78;
+    --dark-blue: #053631;
+
+    --bg: #f9fbf7;
+    --card-bg: #ffffff;
+    --text-dark: #053631;
+    --text-light: #666;
+}
+
+
+/* =========================
+   RESET
+========================= */
+
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+}
+
+body {
+    font-family: 'Noto Sans', sans-serif;
+    background-color: var(--bg);
+    color: var(--text-dark);
+    display: flex;
+}
+
+
+/* =========================
+   SIDEMENU
+========================= */
+
+.sideMenu {
+    width: 240px;
+    height: 100vh;
+    background: var(--dark-blue);
+    color: white;
+    padding: 40px 25px;
+    position: fixed;
+    left: 0;
+    top: 0;
+}
+
+.sideMenu h2 {
+    font-family: 'RenosRough';
+    font-size: 28px;
+    margin-bottom: 30px;
+    color: var(--light-green);
+}
+
+.sideMenu ul {
+    list-style: none;
+}
+
+.sideMenu li {
+    margin-bottom: 18px;
+}
+
+.sideMenu a {
+    text-decoration: none;
+    color: white;
+    font-weight: 500;
+    transition: 0.3s ease;
+}
+
+.sideMenu a:hover {
+    color: var(--orange);
+    padding-left: 5px;
+}
+
+
+/* =========================
+   MAIN CONTAINER
+========================= */
+
+.container {
+    margin-left: 240px;
+    padding: 50px;
+    width: 100%;
+}
+
+
+/* =========================
+   HEADER
+========================= */
+
+header h1 {
+    font-family: 'RenosRough';
+    font-size: 52px;
+    color: var(--orange);
+    margin-bottom: 10px;
+}
+
+.subtitle {
+    color: var(--text-light);
+    font-size: 18px;
+    margin-bottom: 50px;
+}
+
+
+/* =========================
+   PRODUCT GRID
+========================= */
+
+.category-section {
+    margin-bottom: 60px;
+}
+
+.category-title {
+    font-family: 'RenosRough';
+    font-size: 32px;
+    margin-bottom: 25px;
+    color: var(--dark-blue);
+    border-left: 6px solid var(--green);
+    padding-left: 12px;
+}
+
+.product-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(260px, 1fr));
+    gap: 30px;
+}
+
+
+/* =========================
+   PRODUCT CARD
+========================= */
+
+.product-card {
+    background: var(--card-bg);
+    border-radius: 20px;
+    overflow: hidden;
+    box-shadow: 0 10px 25px rgba(0, 0, 0, 0.08);
+    transition: 0.3s ease;
+    cursor: pointer;
+    display: flex;
+    flex-direction: column;
+}
+
+.product-card:hover {
+    transform: translateY(-8px);
+    box-shadow: 0 15px 35px rgba(0, 0, 0, 0.15);
+}
+
+.image-container {
+    height: 200px;
+    position: relative;
+    overflow: hidden;
+}
+
+.product-image {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+}
+
+.price-badge {
+    position: absolute;
+    top: 15px;
+    right: 15px;
+    background: var(--orange);
+    color: white;
+    padding: 8px 14px;
+    border-radius: 30px;
+    font-weight: 600;
+    font-size: 14px;
+}
+
+.kcal-badge {
+    position: absolute;
+    bottom: 15px;
+    left: 15px;
+    background: var(--light-green);
+    color: var(--dark-blue);
+    padding: 6px 12px;
+    border-radius: 30px;
+    font-size: 13px;
+    font-weight: 500;
+}
+
+.product-info {
+    padding: 20px;
+}
+
+.product-name {
+    font-size: 20px;
+    font-weight: 600;
+    margin-bottom: 8px;
+}
+
+.product-desc {
+    font-size: 14px;
+    color: var(--text-light);
+    line-height: 1.5;
+}
+
+
+/* =========================
+   LOADING
+========================= */
+
+.loading {
+    font-size: 20px;
+    color: var(--orange);
+    margin-top: 40px;
+}
+
+
+/* =========================
+   RESPONSIVE
+========================= */
+
+@media (max-width: 900px) {
+    .sideMenu {
+        position: relative;
+        width: 100%;
+        height: auto;
+    }
+
+    .container {
+        margin-left: 0;
+        padding: 30px;
+    }
+
+    body {
+        flex-direction: column;
+    }
+}
