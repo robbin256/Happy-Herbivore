@@ -1,0 +1,119 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="stylesheet" href="assets/css/style.css">
+    <title>Product Page</title>
+</head>
+
+<body>
+    <div class="sideMenu">
+        <h2>Categories</h2>
+        <ul>
+            <li><a href="#">Category 1</a></li>
+            <li><a href="#">Category 2</a></li>
+            <li><a href="#">Category 3</a></li>
+            <li><a href="#">Category 4</a></li>
+        </ul>
+    </div>
+    <div class="container">
+        <header>
+            <h1>Kiosk Menu</h1>
+            <p class="subtitle">Fresh ingredients, healthy choices, prepared daily.</p>
+        </header>
+
+        <div id="loading" class="loading">Loading our delicious menu...</div>
+        <div id="product-container"></div>
+    </div>
+
+    <script>
+        fetch('./api/menu.php')
+            .then(response => {
+                if (!response.ok) {
+                    throw new Error('Network response was not ok');
+                }
+                return response.json();
+            })
+            .then(data => {
+                console.log('Menu data:', data);
+                // Process menu data here
+            })
+            .catch(error => console.error('Error fetching menu:', error));
+    </script>
+    <script>
+        const container = document.getElementById('product-container');
+        const loading = document.getElementById('loading');
+
+        async function fetchProducts() {
+            try {
+                const response = await fetch('./api/list.php');
+                if (!response.ok) throw new Error('Failed to load products');
+
+                const data = await response.json();
+                renderProducts(data.records);
+            } catch (error) {
+                console.error('Error fetching products:', error);
+                loading.innerHTML = `<div class="error-msg">Error: ${error.message}. Please make sure the API is running.</div>`;
+            }
+        }
+
+        function renderProducts(products) {
+            loading.style.display = 'none';
+
+            // Group by category
+            const categories = {};
+            products.forEach(product => {
+                if (!categories[product.category]) {
+                    categories[product.category] = [];
+                }
+                categories[product.category].push(product);
+            });
+
+            // Create sections for each category
+            for (const [category, items] of Object.entries(categories)) {
+                const section = document.createElement('div');
+                section.className = 'category-section';
+
+                section.innerHTML = `
+                    <h2 class="category-title">${category}</h2>
+                    <div class="product-grid">
+                        ${items.map((item, index) => `
+                            <div class="product-card" style="animation-delay: ${index * 0.1}s">
+                                <div class="image-container">
+                                    <img src="assets/img/${item.image || 'placeholder.png'}" 
+                                         alt="${item.name}" 
+                                         class="product-image"
+                                         onerror="this.src='https://via.placeholder.com/400x300?text=No+Image'">
+                                    <span class="price-badge">€${item.price.toFixed(2)}</span>
+                                    ${item.kcal ? `<span class="kcal-badge">${item.kcal} kcal</span>` : ''}
+                                </div>
+                                <div class="product-info">
+                                    <h3 class="product-name">${item.name}</h3>
+                                    <p class="product-desc">${item.description || 'No description available.'}</p>
+                                </div>
+                            </div>
+                        `).join('')}
+                    </div>
+                `;
+                container.appendChild(section);
+            }
+        }
+
+        // Initialize
+        fetchProducts();
+    </script>
+
+    <div class="bottom-bar">
+        <button class="btn-exit">Verlaat</button>
+
+        <button class="btn-cart">
+            🛒 Winkelmand
+        </button>
+
+        <button class="btn-checkout">Bestelling afronden</button>
+    </div>
+</body>
+
+</html>

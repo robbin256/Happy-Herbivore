@@ -1,0 +1,102 @@
+<!DOCTYPE html>
+<html lang="nl">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Winkelmand</title>
+    <link rel="stylesheet" href="assets/css/cart.css">
+</head>
+
+<body>
+
+    <div class="cart-container">
+        <h1>🛒 Winkelmand</h1>
+
+        <div class="cart-items" id="cart-items">
+            <!-- Items komen hier -->
+        </div>
+
+        <div class="cart-summary">
+            <h2>Totaal: € <span id="total">0.00</span></h2>
+            <button class="checkout-btn">Bestelling afronden</button>
+        </div>
+    </div>
+
+    <script>
+        const cartItems = [
+            { id: 1, name: "Chicken Wrap", price: 6.50, quantity: 1 },
+            { id: 2, name: "Fresh Smoothie", price: 4.75, quantity: 2 },
+            { id: 3, name: "Healthy Salad", price: 8.20, quantity: 1 }
+        ];
+
+        const container = document.getElementById("cart-items");
+        const totalEl = document.getElementById("total");
+
+        function renderCart() {
+            container.innerHTML = "";
+
+            let total = 0;
+
+            cartItems.forEach((item, index) => {
+                const itemTotal = item.price * item.quantity;
+                total += itemTotal;
+
+                container.innerHTML += `
+            <div class="cart-item">
+                <div class="item-info">
+                    <h3>${item.name}</h3>
+                    <p>€${item.price.toFixed(2)} per stuk</p>
+                </div>
+
+                <div class="item-controls">
+                    <button onclick="changeQuantity(${index}, -1)">−</button>
+                    <span>${item.quantity}</span>
+                    <button onclick="changeQuantity(${index}, 1)">+</button>
+                </div>
+
+                <div class="item-total">
+                    €${itemTotal.toFixed(2)}
+                </div>
+
+                <button class="remove-btn" onclick="removeItem(${index})">
+                    ✕
+                </button>
+            </div>
+        `;
+            });
+
+            totalEl.textContent = total.toFixed(2);
+        }
+
+        function changeQuantity(index, amount) {
+            cartItems[index].quantity += amount;
+
+            if (cartItems[index].quantity <= 0) {
+                cartItems.splice(index, 1);
+            }
+
+            renderCart();
+        }
+
+        function removeItem(index) {
+            cartItems.splice(index, 1);
+            renderCart();
+        }
+
+        renderCart();
+    </script>
+
+    <div class="bottom-bar">
+        <button class="btn-exit">Verlaat</button>
+
+        <button class="btn-cart">
+            Doorgaan met bestellen
+        </button>
+
+        <button class="btn-checkout">Bestelling afronden</button>
+    </div>
+
+</body>
+
+</html>
