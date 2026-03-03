@@ -42,7 +42,7 @@
             })
             .catch(error => console.error('Error fetching menu:', error));
     </script>
-        <script>
+    <script>
         const container = document.getElementById('product-container');
         const loading = document.getElementById('loading');
 
@@ -104,6 +104,16 @@
         // Initialize
         fetchProducts();
     </script>
+
+    <div class="bottom-bar">
+        <button class="btn-exit">Verlaat</button>
+
+        <button class="btn-cart">
+            🛒 Winkelmand
+        </button>
+
+        <button class="btn-checkout">Bestelling afronden</button>
+    </div>
 </body>
 
 </html>
