@@ -14,62 +14,73 @@
         <h1>🛒 Winkelmand</h1>
 
         <div class="cart-items" id="cart-items">
-            <!-- Items komen hier -->
         </div>
 
         <div class="cart-summary">
-            <h2>Totaal: € <span id="total">0.00</span></h2>
+            <h2>Total: € <span id="total">0.00</span></h2>
             <button class="checkout-btn">Bestelling afronden</button>
         </div>
+
     </div>
 
     <script>
-        const cartItems = [
-            { id: 1, name: "Chicken Wrap", price: 6.50, quantity: 1 },
-            { id: 2, name: "Fresh Smoothie", price: 4.75, quantity: 2 },
-            { id: 3, name: "Healthy Salad", price: 8.20, quantity: 1 }
-        ];
+
+        let cartItems = JSON.parse(sessionStorage.getItem("cart")) || [];
 
         const container = document.getElementById("cart-items");
         const totalEl = document.getElementById("total");
 
+        function saveCart() {
+            sessionStorage.setItem("cart", JSON.stringify(cartItems));
+        }
+
         function renderCart() {
+
             container.innerHTML = "";
 
             let total = 0;
 
             cartItems.forEach((item, index) => {
+
                 const itemTotal = item.price * item.quantity;
+
                 total += itemTotal;
 
                 container.innerHTML += `
-            <div class="cart-item">
-                <div class="item-info">
+                    <div class="cart-item">
+
+                    <div class="item-info">
                     <h3>${item.name}</h3>
                     <p>€${item.price.toFixed(2)} per stuk</p>
-                </div>
+                    </div>
 
-                <div class="item-controls">
-                    <button onclick="changeQuantity(${index}, -1)">−</button>
+                    <div class="item-controls">
+                    <button onclick="changeQuantity(${index},-1)">−</button>
                     <span>${item.quantity}</span>
-                    <button onclick="changeQuantity(${index}, 1)">+</button>
-                </div>
+                    <button onclick="changeQuantity(${index},1)">+</button>
+                    </div>
 
-                <div class="item-total">
+                    <div class="item-total">
                     €${itemTotal.toFixed(2)}
-                </div>
+                    </div>
 
-                <button class="remove-btn" onclick="removeItem(${index})">
+                    <button class="remove-btn" onclick="removeItem(${index})">
                     ✕
-                </button>
-            </div>
-        `;
+                    </button>
+
+                    </div>
+                    `;
+
             });
 
             totalEl.textContent = total.toFixed(2);
+
+            saveCart();
+
         }
 
         function changeQuantity(index, amount) {
+
             cartItems[index].quantity += amount;
 
             if (cartItems[index].quantity <= 0) {
@@ -77,25 +88,74 @@
             }
 
             renderCart();
+
         }
 
         function removeItem(index) {
+
             cartItems.splice(index, 1);
+
             renderCart();
+
         }
 
         renderCart();
+
     </script>
 
     <div class="bottom-bar">
+
         <button class="btn-exit">Verlaat</button>
 
-        <button class="btn-cart">
+        <button class="btn-cart" onclick="window.location.href='productPage.html'">
             Doorgaan met bestellen
         </button>
 
-        <button class="btn-checkout">Bestelling afronden</button>
+        <button class="btn-checkout" id="checkout-btn">
+            Bestelling afronden
+        </button>
+
     </div>
+
+    <script>
+
+        document.getElementById("checkout-btn").addEventListener("click", checkout);
+
+        async function checkout() {
+            if (cartItems.length === 0) {
+                alert("Je winkelmand is leeg!");
+                return;
+            }
+
+            try {
+                const response = await fetch("./api/create_order.php", {
+                    method: "POST",
+                    headers: {
+                        "Content-Type": "application/json"
+                    },
+                    body: JSON.stringify({ items: cartItems })
+                });
+
+                // response.json() maar één keer aanroepen
+                const data = await response.json();
+
+                console.log("API response:", data);
+
+                if (data.success) {
+                    alert("Bestelling geplaatst! Pickup nummer: " + data.pickup_number);
+                    sessionStorage.removeItem("cart"); // cart leegmaken
+                    window.location.href = "index.html"; // terug naar home
+                } else {
+                    alert("Fout bij bestelling: " + (data.error || "Onbekend"));
+                }
+
+            } catch (e) {
+                console.error("Checkout error:", e);
+                alert("Er ging iets mis bij het plaatsen van de bestelling");
+            }
+        }
+    </script>
+
 
 </body>
 

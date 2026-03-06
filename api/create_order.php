@@ -1,15 +1,26 @@
 <?php
-session_start();
-require 'db.php';
+header("Content-Type: application/json");
 
-if(empty($_SESSION['cart'])){
-    echo json_encode(["error" => "Cart is empty"]);
+// db.php correct includen
+require __DIR__ . '/config/database.php';
+
+// Database verbinding maken via class
+$database = new Database();
+$pdo = $database->getConnection();
+
+// JSON cart ontvangen van fetch
+$input = json_decode(file_get_contents("php://input"), true);
+
+if(empty($input['items'])){
+    echo json_encode(["error"=>"Cart is empty"]);
     exit;
 }
 
-$pdo->beginTransaction();
+$cart = $input['items'];
 
 try {
+
+    $pdo->beginTransaction();
 
     // 🔢 Pickup number genereren (01-99 per dag)
     $stmt = $pdo->prepare("
@@ -18,7 +29,7 @@ try {
         WHERE DATE(datetime) = CURDATE()
     ");
     $stmt->execute();
-    $result = $stmt->fetch(PDO::FETCH_ASSOC);
+    $result = $stmt->fetch();
 
     $nextPickup = $result['max_pickup'] ? intval($result['max_pickup']) + 1 : 1;
     if($nextPickup > 99) $nextPickup = 1;
@@ -27,8 +38,8 @@ try {
 
     // 💰 Totaal berekenen
     $total = 0;
-    foreach($_SESSION['cart'] as $item){
-        $total += $item['price'];
+    foreach($cart as $item){
+        $total += $item['price'] * $item['quantity'];
     }
 
     // 🛒 Order aanmaken (status 2 = Placed and paid)
@@ -40,21 +51,19 @@ try {
 
     $order_id = $pdo->lastInsertId();
 
-    // 📦 Producten koppelen
+    // 📦 Producten koppelen met quantity
     $stmt = $pdo->prepare("
-        INSERT INTO order_product (order_id, product_id, price)
-        VALUES (?, ?, ?)
+        INSERT INTO order_product (order_id, product_id, price, quantity)
+        VALUES (?, ?, ?, ?)
     ");
 
-    foreach($_SESSION['cart'] as $item){
-        $stmt->execute([$order_id, $item['product_id'], $item['price']]);
+    foreach($cart as $item){
+        $stmt->execute([$order_id, $item['id'], $item['price'], $item['quantity']]);
     }
 
     $pdo->commit();
 
-    // Cart leegmaken
-    unset($_SESSION['cart']);
-
+    // ✅ Response teruggeven
     echo json_encode([
         "success" => true,
         "order_id" => $order_id,

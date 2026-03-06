@@ -257,7 +257,7 @@ header h1 {
     z-index: 1000;
 }
 
-.bottom-bar button {
+.bottom-bar .btn-cart, .btn-exit, .btn-checkout {
     border: none;
     border-radius: 30px;
     padding: 12px 25px;
