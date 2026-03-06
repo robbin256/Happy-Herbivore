@@ -114,6 +114,22 @@
 
         <button class="btn-checkout">Bestelling afronden</button>
     </div>
+
+    <script>
+        fetch('/api/add_to_cart.php', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ product_id: 5 })
+        });
+
+        fetch('/api/create_order.php', {
+            method: 'POST'
+        })
+            .then(res => res.json())
+            .then(data => {
+                alert("Bestelling geplaatst! Pickup nummer: " + data.pickup_number);
+            });
+    </script>
 </body>
 
 </html>
