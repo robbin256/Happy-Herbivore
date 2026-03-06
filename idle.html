@@ -1,0 +1,142 @@
+<!DOCTYPE html>
+<html lang="nl">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Happy Herbivore</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body,
+        html {
+            width: 1080px;
+            height: 1920px;
+            overflow: hidden;
+            background-color: #000;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        }
+
+        /* Container for background images */
+        .bg-slider {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 1080px;
+            height: 1920px;
+            z-index: 1;
+        }
+
+        .bg-slide {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-size: cover;
+            background-position: center;
+            opacity: 0;
+            transition: opacity 2s ease-in-out;
+        }
+
+        .bg-slide.active {
+            opacity: 1;
+        }
+
+        /* Dark overlay to make the logo pop */
+        .overlay {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(to bottom, rgba(0, 0, 0, 0.3) 0%, rgba(0, 0, 0, 0.7) 100%);
+            z-index: 2;
+        }
+
+        /* Logo styling */
+        .logo-container {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            z-index: 3;
+            text-align: center;
+            width: 80%;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            flex-direction: column;
+        }
+
+        .logo-container img {
+            max-width: 800px;
+            filter: drop-shadow(0 20px 30px rgba(0, 0, 0, 0.5));
+            animation: float 6s ease-in-out infinite;
+        }
+
+        @keyframes float {
+            0% {
+                transform: translateY(0px);
+            }
+
+            50% {
+                transform: translateY(-20px);
+            }
+
+            100% {
+                transform: translateY(0px);
+            }
+        }
+    </style>
+</head>
+
+<body>
+
+    <!-- Background Images -->
+    <div class="bg-slider" id="slider"></div>
+
+    <div class="overlay"></div>
+
+    <!-- Center Logo -->
+    <div class="logo-container">
+        <img src="assets/logo's/logo-happy.png" alt="Happy Herbivore Logo">
+    </div>
+
+    <script>
+        // Lijst met foto's uit de assets/img folder
+        const images = [
+            'avocado_halloumi_toastie.png',
+            'berry_blast_smoothie.png',
+            'classic_hummus.png',
+            'green_glow_smoothie.png',
+            'morning_boost_acai_bowl.png'
+        ];
+
+        const slider = document.getElementById('slider');
+
+        // Creëer de img divs
+        images.forEach((img, index) => {
+            const slide = document.createElement('div');
+            slide.className = 'bg-slide' + (index === 0 ? ' active' : '');
+            slide.style.backgroundImage = `url('assets/img/${img}')`;
+            slider.appendChild(slide);
+        });
+
+        const slides = document.querySelectorAll('.bg-slide');
+        let currentSlide = 0;
+
+        // Roulatie elke 5 seconden (5000 ms)
+        setInterval(() => {
+            slides[currentSlide].classList.remove('active');
+            currentSlide = (currentSlide + 1) % slides.length;
+            slides[currentSlide].classList.add('active');
+        }, 5000);
+    </script>
+</body>
+
+</html>
