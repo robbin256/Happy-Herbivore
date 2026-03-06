@@ -166,8 +166,8 @@
     <div id="logo-container">
         <img src="assets/logo%27s/logo-happy.png" alt="Happy Herbivore Logo">
         <div class="button-container">
-            <a href="#" class="btn" id="eat-here">hier opeten</a>
-            <a href="#" class="btn" id="takeaway">afhalen</a>
+            <a href="VUL_HIER_PAGINA_IN.php" class="btn" id="eat-here">hier opeten</a>
+            <a href="VUL_HIER_PAGINA_IN.php" class="btn" id="takeaway">afhalen</a>
         </div>
     </div>
 
@@ -198,7 +198,7 @@
                     currentIndex = (currentIndex + 1) % images.length;
                     bgElements[currentIndex].classList.add('active');
                 }
-            }, 5000);
+            }, 3000);
         }
     </script>
 </body>
