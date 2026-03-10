@@ -12,21 +12,16 @@
 
     <div class="sideMenu">
         <h2>Categories</h2>
-        <ul>
-            <li><a href="#">Category 1</a></li>
-            <li><a href="#">Category 2</a></li>
-            <li><a href="#">Category 3</a></li>
-            <li><a href="#">Category 4</a></li>
+        <ul id="category-list">
         </ul>
     </div>
 
     <div class="container">
         <header>
             <h1>Kiosk Menu</h1>
-            <p class="subtitle">Fresh ingredients, healthy choices, prepared daily.</p>
+            <p class="subtitle">Prepared fresh every day with healthy ingredients.</p>
         </header>
-
-        <div id="loading" class="loading">Loading our delicious menu...</div>
+        <div id="loading" class="loading">Het menu is aan het laden...</div>
         <div id="product-container"></div>
     </div>
 
@@ -71,6 +66,31 @@
             }
         }
 
+        // vul categorieën links
+        function renderCategoryList(products) {
+            const categoryList = document.getElementById("category-list");
+
+            // unieke categorieën ophalen
+            const uniqueCategories = [...new Set(products.map(p => p.category))];
+
+            uniqueCategories.forEach(category => {
+                const li = document.createElement("li");
+                const a = document.createElement("a");
+                a.href = "#" + category.replace(/\s+/g, '-'); // id safe
+                a.textContent = category;
+                a.addEventListener("click", e => {
+                    e.preventDefault();
+                    const target = document.getElementById(category.replace(/\s+/g, '-'));
+                    if (target) {
+                        target.scrollIntoView({ behavior: "smooth", block: "start" });
+                    }
+                });
+                li.appendChild(a);
+                categoryList.appendChild(li);
+            });
+        }
+
+        // update renderProducts zodat elke sectie een id krijgt
         function renderProducts(products) {
 
             loading.style.display = 'none';
@@ -78,66 +98,50 @@
             const categories = {};
 
             products.forEach(product => {
-
-                if (!categories[product.category]) {
-                    categories[product.category] = [];
-                }
-
+                if (!categories[product.category]) categories[product.category] = [];
                 categories[product.category].push(product);
-
             });
 
+            container.innerHTML = ""; // eerst leegmaken
+
             for (const [category, items] of Object.entries(categories)) {
-
                 const section = document.createElement('div');
-
                 section.className = 'category-section';
+                section.id = category.replace(/\s+/g, '-'); // id voor scrollen
 
                 section.innerHTML = `
-
             <h2 class="category-title">${category}</h2>
-
             <div class="product-grid">
-
                 ${items.map((item, index) => `
-
                     <div class="product-card"
                         onclick="addToCart(${item.id})"
                         style="animation-delay: ${index * 0.1}s">
 
                         <div class="image-container">
-
                             <img src="assets/img/${item.image || 'placeholder.png'}"
                                  alt="${item.name}"
                                  class="product-image"
                                  onerror="this.src='https://via.placeholder.com/400x300?text=No+Image'">
 
                             <span class="price-badge">€${item.price.toFixed(2)}</span>
-
                             ${item.kcal ? `<span class="kcal-badge">${item.kcal} kcal</span>` : ''}
-
                         </div>
 
                         <div class="product-info">
-
                             <h3 class="product-name">${item.name}</h3>
-
                             <p class="product-desc">${item.description || 'No description available.'}</p>
-
                         </div>
 
                     </div>
-
                 `).join('')}
-
             </div>
-
         `;
 
                 container.appendChild(section);
-
             }
 
+            // categorieën lijst bijwerken
+            renderCategoryList(products);
         }
 
         function addToCart(productId) {
@@ -174,13 +178,12 @@
 
     <div class="bottom-bar">
 
-        <button class="btn-exit">
-            Verlaat
-        </button>
+        <button class="btn-exit" onclick="window.location.href='idlepage.php'">Verlaat</button>
 
-        <a href="cart.html" class="btn-cart" style="text-decoration: none;">
-            🛒 Winkelmand
-        </a>
+
+        <button onclick="window.location.href= 'cart.html'" class="btn-cart">🛒 Winkelmand
+            <span class="cart-count" id="cart-count">0</span>
+        </button>
 
         <button class="btn-checkout">
             Bestelling afronden
@@ -207,6 +210,39 @@
 
     </script>
 
+    <script>
+        function updateCartCount() {
+            const cart = JSON.parse(sessionStorage.getItem("cart")) || [];
+            const count = cart.reduce((total, item) => total + item.quantity, 0);
+            document.getElementById("cart-count").textContent = count;
+        }
+
+        // Roep dit aan nadat je cart aanpast
+        function addToCart(productId) {
+            let cart = JSON.parse(sessionStorage.getItem("cart")) || [];
+            const product = allProducts.find(p => p.id == productId);
+            const existing = cart.find(p => p.id == productId);
+
+            if (existing) {
+                existing.quantity++;
+            } else {
+                cart.push({
+                    id: product.id,
+                    name: product.name,
+                    price: product.price,
+                    quantity: 1
+                });
+            }
+
+            sessionStorage.setItem("cart", JSON.stringify(cart));
+            console.log("Cart:", cart);
+
+            updateCartCount(); // update badge
+        }
+
+        // Initialiseer bij paginalaad
+        updateCartCount();
+    </script>
 </body>
 
 </html>

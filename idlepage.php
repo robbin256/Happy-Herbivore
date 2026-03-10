@@ -166,8 +166,8 @@
     <div id="logo-container">
         <img src="assets/logo%27s/logo-happy.png" alt="Happy Herbivore Logo">
         <div class="button-container">
-            <a href="VUL_HIER_PAGINA_IN.php" class="btn" id="eat-here">hier opeten</a>
-            <a href="VUL_HIER_PAGINA_IN.php" class="btn" id="takeaway">afhalen</a>
+            <a href="productPage.html" class="btn" id="eat-here">hier opeten</a>
+            <a href="productPage.html" class="btn" id="takeaway">afhalen</a>
         </div>
     </div>
 
