@@ -13,13 +13,21 @@
 <body>
 
     <div class="cart-container">
-        <h1>🛒 Winkelmand</h1>
+
+        <div class="cart-header">
+            <button class="back-btn" onclick="window.location.href='productPage.html'">
+                ← Terug naar producten
+            </button>
+
+            <h1>Winkelmand</h1>
+        </div>
 
         <div class="cart-items" id="cart-items"></div>
 
         <div class="cart-summary">
             <h2>Total: € <span id="total">0.00</span></h2>
         </div>
+
     </div>
 
     <script>
@@ -99,14 +107,6 @@
     </script>
 
     <div class="bottom-bar">
-
-        <button class="btn-exit" onclick="window.location.href='idlepage.php'">
-            Verlaat
-        </button>
-
-        <button class="btn-cart" onclick="window.location.href='productPage.html'">
-            Doorgaan met bestellen
-        </button>
 
         <button class="btn-checkout" id="checkout-btn">
             Bestelling afronden

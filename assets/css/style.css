@@ -267,17 +267,6 @@ header h1 {
     transition: 0.3s ease;
 }
 
-/* Exit knop */
-/* .btn-exit {
-    justify-self: left;
-    background: transparent;
-    color: white;
-} */
-
-/* .btn-exit:hover {
-    background: var(--light-green);
-    color: var(--dark-blue);
-} */
 
 /* Winkelmand knop */
 .btn-cart:hover {
