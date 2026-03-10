@@ -2,47 +2,49 @@
 <html lang="nl">
 
 <head>
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Winkelmand</title>
-<link rel="stylesheet" href="assets/css/cart.css">
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Winkelmand</title>
+    <link rel="stylesheet" href="assets/css/cart.css">
+    <link rel="icon" type="image/png" href="assets/logo's/logo-happy.png">
+
 </head>
 
 <body>
 
-<div class="cart-container">
-<h1>🛒 Winkelmand</h1>
+    <div class="cart-container">
+        <h1>🛒 Winkelmand</h1>
 
-<div class="cart-items" id="cart-items"></div>
+        <div class="cart-items" id="cart-items"></div>
 
-<div class="cart-summary">
-<h2>Total: € <span id="total">0.00</span></h2>
-</div>
-</div>
+        <div class="cart-summary">
+            <h2>Total: € <span id="total">0.00</span></h2>
+        </div>
+    </div>
 
-<script>
+    <script>
 
-let cartItems = JSON.parse(sessionStorage.getItem("cart")) || [];
+        let cartItems = JSON.parse(sessionStorage.getItem("cart")) || [];
 
-const container = document.getElementById("cart-items");
-const totalEl = document.getElementById("total");
+        const container = document.getElementById("cart-items");
+        const totalEl = document.getElementById("total");
 
-function saveCart() {
-sessionStorage.setItem("cart", JSON.stringify(cartItems));
-}
+        function saveCart() {
+            sessionStorage.setItem("cart", JSON.stringify(cartItems));
+        }
 
-function renderCart() {
+        function renderCart() {
 
-container.innerHTML = "";
+            container.innerHTML = "";
 
-let total = 0;
+            let total = 0;
 
-cartItems.forEach((item, index) => {
+            cartItems.forEach((item, index) => {
 
-const itemTotal = item.price * item.quantity;
-total += itemTotal;
+                const itemTotal = item.price * item.quantity;
+                total += itemTotal;
 
-container.innerHTML += `
+                container.innerHTML += `
 <div class="cart-item">
 
 <div class="item-info">
@@ -67,309 +69,308 @@ container.innerHTML += `
 </div>
 `;
 
-});
+            });
 
-totalEl.textContent = total.toFixed(2);
+            totalEl.textContent = total.toFixed(2);
 
-saveCart();
-}
+            saveCart();
+        }
 
-function changeQuantity(index, amount) {
+        function changeQuantity(index, amount) {
 
-cartItems[index].quantity += amount;
+            cartItems[index].quantity += amount;
 
-if (cartItems[index].quantity <= 0) {
-cartItems.splice(index, 1);
-}
+            if (cartItems[index].quantity <= 0) {
+                cartItems.splice(index, 1);
+            }
 
-renderCart();
-}
+            renderCart();
+        }
 
-function removeItem(index) {
+        function removeItem(index) {
 
-cartItems.splice(index, 1);
-renderCart();
+            cartItems.splice(index, 1);
+            renderCart();
 
-}
+        }
 
-renderCart();
+        renderCart();
 
-</script>
+    </script>
 
-<div class="bottom-bar">
+    <div class="bottom-bar">
 
-<button class="btn-exit" onclick="window.location.href='idlepage.php'">
-Verlaat
-</button>
+        <button class="btn-exit" onclick="window.location.href='idlepage.php'">
+            Verlaat
+        </button>
 
-<button class="btn-cart" onclick="window.location.href='productPage.html'">
-Doorgaan met bestellen
-</button>
+        <button class="btn-cart" onclick="window.location.href='productPage.html'">
+            Doorgaan met bestellen
+        </button>
 
-<button class="btn-checkout" id="checkout-btn">
-Bestelling afronden
-</button>
+        <button class="btn-checkout" id="checkout-btn">
+            Bestelling afronden
+        </button>
 
-</div>
+    </div>
 
-<script>
+    <script>
 
-document.getElementById("checkout-btn").addEventListener("click", checkout);
+        document.getElementById("checkout-btn").addEventListener("click", checkout);
 
-async function checkout() {
+        async function checkout() {
 
-if (cartItems.length === 0) {
-alert("Je winkelmand is leeg!");
-return;
-}
+            if (cartItems.length === 0) {
+                alert("Je winkelmand is leeg!");
+                return;
+            }
 
-try {
+            try {
 
-const response = await fetch("./api/create_order.php", {
-method: "POST",
-headers: {
-"Content-Type": "application/json"
-},
-body: JSON.stringify({
-items: cartItems
-})
-});
+                const response = await fetch("./api/create_order.php", {
+                    method: "POST",
+                    headers: {
+                        "Content-Type": "application/json"
+                    },
+                    body: JSON.stringify({
+                        items: cartItems
+                    })
+                });
 
-const data = await response.json();
+                const data = await response.json();
 
-console.log("API response:", data);
+                console.log("API response:", data);
 
-if (data.success) {
+                if (data.success) {
 
-alert("Bestelling geplaatst! Pickup nummer: " + data.pickup_number);
+                    // BON PRINTEN
+                    await printUSB(data.pickup_number);
 
-// BON PRINTEN
-await printUSB(data.pickup_number);
+                    sessionStorage.removeItem("cart");
 
-sessionStorage.removeItem("cart");
+                    window.location.href = "bedanktpage.php";
 
-window.location.href = "idlepage.php";
+                } else {
 
-} else {
+                    alert("Fout bij bestelling: " + (data.error || "Onbekend"));
 
-alert("Fout bij bestelling: " + (data.error || "Onbekend"));
+                }
 
-}
+            } catch (e) {
 
-} catch (e) {
+                console.error("Checkout error:", e);
+                alert("Er ging iets mis bij het plaatsen van de bestelling");
 
-console.error("Checkout error:", e);
-alert("Er ging iets mis bij het plaatsen van de bestelling");
+            }
 
-}
+        }
 
-}
+    </script>
 
-</script>
+    <script>
 
-<script>
+        let selectedDevice = null;
 
-let selectedDevice = null;
+        const PRINTER_VENDORS = [
+            0x0483,
+            0x04b8,
+            0x0456,
+            0x067b
+        ];
 
-const PRINTER_VENDORS = [
-0x0483,
-0x04b8,
-0x0456,
-0x067b
-];
+        async function autoDetectPrinter() {
 
-async function autoDetectPrinter() {
+            try {
 
-try {
+                if (!navigator.usb) {
+                    throw new Error('WebUSB niet ondersteund');
+                }
 
-if (!navigator.usb) {
-throw new Error('WebUSB niet ondersteund');
-}
+                const devices = await navigator.usb.getDevices();
 
-const devices = await navigator.usb.getDevices();
+                const printer = devices.find(device =>
+                    PRINTER_VENDORS.includes(device.vendorId)
+                );
 
-const printer = devices.find(device =>
-PRINTER_VENDORS.includes(device.vendorId)
-);
+                if (printer) {
 
-if (printer) {
+                    selectedDevice = printer;
+                    return true;
 
-selectedDevice = printer;
-return true;
+                }
 
-}
+                const filters = PRINTER_VENDORS.map(vendorId => ({ vendorId }));
 
-const filters = PRINTER_VENDORS.map(vendorId => ({ vendorId }));
+                selectedDevice = await navigator.usb.requestDevice({ filters });
 
-selectedDevice = await navigator.usb.requestDevice({ filters });
+                return true;
 
-return true;
+            } catch (error) {
 
-} catch (error) {
+                console.error('Auto-detect Error:', error);
+                return false;
 
-console.error('Auto-detect Error:', error);
-return false;
+            }
 
-}
+        }
 
-}
+        async function selectUSBDevice() {
 
-async function selectUSBDevice() {
+            const success = await autoDetectPrinter();
 
-const success = await autoDetectPrinter();
+            if (!success) {
+                alert("Geen printer geselecteerd");
+            }
 
-if (!success) {
-alert("Geen printer geselecteerd");
-}
+        }
 
-}
+        async function printUSB(pickupNumber) {
 
-async function printUSB(pickupNumber) {
+            try {
 
-try {
+                if (!selectedDevice) {
 
-if (!selectedDevice) {
+                    await selectUSBDevice();
 
-await selectUSBDevice();
+                    if (!selectedDevice) return;
 
-if (!selectedDevice) return;
+                }
 
-}
+                await selectedDevice.open();
 
-await selectedDevice.open();
+                if (selectedDevice.configuration === null) {
+                    await selectedDevice.selectConfiguration(1);
+                }
 
-if (selectedDevice.configuration === null) {
-await selectedDevice.selectConfiguration(1);
-}
+                try {
+                    await selectedDevice.claimInterface(0);
+                } catch (e) { }
 
-try {
-await selectedDevice.claimInterface(0);
-} catch (e) {}
+                const encoder = new TextEncoder();
 
-const encoder = new TextEncoder();
+                const receipt = buildReceipt(pickupNumber);
 
-const receipt = buildReceipt(pickupNumber);
+                const intf = selectedDevice.configuration.interfaces[0].alternates[0];
 
-const intf = selectedDevice.configuration.interfaces[0].alternates[0];
+                const endpoint = intf.endpoints.find(e => e.direction === 'out');
 
-const endpoint = intf.endpoints.find(e => e.direction === 'out');
+                await selectedDevice.transferOut(
+                    endpoint.endpointNumber,
+                    encoder.encode(receipt)
+                );
 
-await selectedDevice.transferOut(
-endpoint.endpointNumber,
-encoder.encode(receipt)
-);
+                setTimeout(() => {
+                    selectedDevice.close();
+                }, 1000);
 
-setTimeout(() => {
-selectedDevice.close();
-}, 1000);
+            } catch (error) {
 
-} catch (error) {
+                console.error('USB Print Error:', error);
+                alert("Printer fout: " + error.message);
 
-console.error('USB Print Error:', error);
-alert("Printer fout: " + error.message);
+            }
 
-}
+        }
 
-}
+        async function printNetwork(pickupNumber) {
 
-async function printNetwork(pickupNumber) {
+            try {
 
-try {
+                const response = await fetch('xprint.php', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify({
+                        action: 'print',
+                        receipt: buildReceipt(pickupNumber)
+                    })
+                });
 
-const response = await fetch('xprint.php', {
-method: 'POST',
-headers: {
-'Content-Type': 'application/json'
-},
-body: JSON.stringify({
-action: 'print',
-receipt: buildReceipt(pickupNumber)
-})
-});
+                const data = await response.json();
 
-const data = await response.json();
+                if (!data.success) {
+                    alert("Printer fout: " + data.error);
+                }
 
-if (!data.success) {
-alert("Printer fout: " + data.error);
-}
+            } catch (error) {
 
-} catch (error) {
+                console.error('Network Print Error:', error);
 
-console.error('Network Print Error:', error);
+            }
 
-}
+        }
 
-}
+        function buildReceipt(pickupNumber = "") {
 
-function buildReceipt(pickupNumber = "") {
+            let receipt = "";
+            let total = 0;
 
-let receipt = "";
-let total = 0;
+            receipt += "\x1B\x40";
+            receipt += "\x1B\x61\x01";
 
-receipt += "\x1B\x40";
-receipt += "\x1B\x61\x01";
+            receipt += "Happy Herbivore\n";
 
-receipt += "Koen zijn Awesome shop\n";
+            if (pickupNumber) {
+                receipt += "Pickup: #" + pickupNumber + "\n";
+            }
 
-if (pickupNumber) {
-receipt += "Pickup: #" + pickupNumber + "\n";
-}
+            receipt += "\n";
 
-receipt += "\n";
+            receipt += "\x1B\x61\x00";
 
-receipt += "\x1B\x61\x00";
+            receipt += "--------------------------------\n";
 
-receipt += "--------------------------------\n";
+            cartItems.forEach(item => {
 
-cartItems.forEach(item => {
+                const itemTotal = item.price * item.quantity;
 
-const itemTotal = item.price * item.quantity;
+                total += itemTotal;
 
-total += itemTotal;
+                let name = item.name;
 
-let name = item.name;
+                if (name.length > 20) {
+                    name = name.substring(0, 20);
+                }
 
-if (name.length > 20) {
-name = name.substring(0,20);
-}
+                const line =
+                    item.quantity + "x " +
+                    name.padEnd(20, " ") +
+                    itemTotal.toFixed(2).padStart(8, " ");
 
-const line =
-item.quantity + "x " +
-name.padEnd(20," ") +
-itemTotal.toFixed(2).padStart(8," ");
+                receipt += line + "\n";
 
-receipt += line + "\n";
+            });
 
-});
+            receipt += "--------------------------------\n";
 
-receipt += "--------------------------------\n";
+            receipt += "Totaal: " + total.toFixed(2) + " EUR\n";
 
-receipt += "Totaal: " + total.toFixed(2) + " EUR\n";
+            const now = new Date();
 
-const now = new Date();
+            receipt += "\n";
+            receipt += now.toLocaleString() + "\n";
 
-receipt += "\n";
-receipt += now.toLocaleString() + "\n";
+            receipt += "\nBedankt voor uw bestelling!\n";
 
-receipt += "\nBedankt voor uw bestelling!\n";
+            receipt += "\n\n\n";
 
-receipt += "\n\n\n";
+            receipt += "\x1D\x56\x00";
 
-receipt += "\x1D\x56\x00";
+            return receipt;
 
-return receipt;
+        }
 
-}
+        window.addEventListener('load', () => {
 
-window.addEventListener('load', () => {
+            if (navigator.usb) {
+                autoDetectPrinter();
+            }
 
-if (navigator.usb) {
-autoDetectPrinter();
-}
+        });
 
-});
-
-</script>
+    </script>
 
 </body>
+
 </html>

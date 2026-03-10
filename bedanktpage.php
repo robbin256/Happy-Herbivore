@@ -20,7 +20,20 @@ $images_json = json_encode($images);
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Bedankt voor je bestelling - Happy Herbivore</title>
+    <link rel="icon" type="image/png" href="assets/logo's/logo-happy.png">
     <style>
+        @font-face {
+            font-family: 'RenosRough';
+            src: url('../fonts/Renos-Rough.ttf') format('truetype');
+            font-weight: normal;
+            font-style: normal;
+        }
+
+        * {
+            font-family: 'RenosRough';
+        }
+
+
         body,
         html {
             margin: 0;
@@ -104,7 +117,7 @@ $images_json = json_encode($images);
             font-weight: 800;
             margin: 0 0 30px 0;
             background: linear-gradient(135deg, #2ed573, #7bed9f);
-            -webkit-background-clip: text;
+            /* -webkit-background-clip: text; */
             -webkit-text-fill-color: transparent;
             text-transform: uppercase;
             letter-spacing: 2px;
