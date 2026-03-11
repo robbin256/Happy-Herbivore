@@ -147,6 +147,7 @@
 
         function addToCart(productId) {
 
+
             let cart = JSON.parse(sessionStorage.getItem("cart")) || [];
 
             const product = allProducts.find(p => p.id == productId);
@@ -167,13 +168,28 @@
             }
 
             sessionStorage.setItem("cart", JSON.stringify(cart));
-
-            console.log("Cart:", cart);
-
         }
 
         fetchProducts();
 
+    </script>
+
+    <div id="cart-popup">Toegevoegd aan winkelmand</div>
+
+    <script>
+        function showCartPopup() {
+
+            console.log("Showing cart popup");
+
+            const popup = document.getElementById("cart-popup");
+
+            popup.classList.add("show");
+
+            setTimeout(() => {
+                popup.classList.remove("show");
+            }, 1000);
+
+        }
     </script>
 
 
@@ -211,6 +227,8 @@
 
         // Roep dit aan nadat je cart aanpast
         function addToCart(productId) {
+            console.log("Adding product to cart:", productId);
+            showCartPopup();
             let cart = JSON.parse(sessionStorage.getItem("cart")) || [];
             const product = allProducts.find(p => p.id == productId);
             const existing = cart.find(p => p.id == productId);
@@ -227,7 +245,6 @@
             }
 
             sessionStorage.setItem("cart", JSON.stringify(cart));
-            console.log("Cart:", cart);
 
             updateCartCount(); // update badge
         }

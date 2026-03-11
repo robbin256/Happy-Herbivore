@@ -69,6 +69,29 @@ body {
     display: flex;
 }
 
+#cart-popup {
+    position: fixed;
+    top: 50%;
+    left: calc(50% + 120px);
+    transform: translate(-50%, -50%) scale(0.8);
+    background: var(--light-green);
+    color: white;
+    padding: 20px 30px;
+    border-radius: 12px;
+    font-weight: bold;
+    opacity: 0;
+    pointer-events: none;
+    transition: opacity 0.3s ease, transform 0.3s ease;
+    z-index: 9999;
+    text-align: center;
+    right: 120px;
+}
+
+#cart-popup.show {
+    opacity: 1;
+    transform: translate(-50%, -50%) scale(1);
+}
+
 
 /* =========================
    SIDEMENU

@@ -146,6 +146,8 @@
                     // BON PRINTEN
                     await printUSB(data.pickup_number);
 
+                    sessionStorage.setItem("pickupNumber", data.pickup_number);
+
                     sessionStorage.removeItem("cart");
 
                     window.location.href = "bedanktpage.php";
