@@ -1,3 +1,14 @@
+@font-face {
+    font-family: 'RenosRough';
+    src: url('../fonts/Renos-Rough.ttf') format('truetype');
+    font-weight: normal;
+    font-style: normal;
+}
+
+*{
+    font-family: 'RenosRough';
+}
+
 :root {
     --orange: #ff7520;
     --light-orange: #ffb181;
@@ -20,8 +31,39 @@ body {
 
 .cart-container {
     padding: 40px;
+    padding-bottom: 70px;
     max-width: 900px;
     margin: auto;
+}
+
+.cart-header{
+    position: relative;
+    text-align: center;
+    margin-bottom: 30px;
+}
+
+.cart-header h1{
+    margin: 0;
+}
+
+.back-btn{
+    position: absolute;
+    left: 0;
+    top: 50%;
+    transform: translateY(-50%);
+
+    padding: 10px 16px;
+    border: none;
+    border-radius: 30px;
+    background: var(--orange);
+    color: white;
+    font-size: 14px;
+    cursor: pointer;
+    transition: background 0.2s ease;
+}
+
+.back-btn:hover{
+    background: var(--light-orange);
 }
 
 h1 {
@@ -119,7 +161,6 @@ h1 {
 .checkout-btn:hover {
     background: var(--light-green);
 }
-
 /* =========================
    BOTTOM BAR
 ========================= */
@@ -127,66 +168,39 @@ h1 {
 .bottom-bar {
     position: fixed;
     bottom: 0;
-    /* left: 240px; */
-    /* zelfde als sideMenu width */
     width: 100%;
-    height: 80px;
+    height: 160px;
     background: var(--dark-blue);
     display: flex;
-
-
-    display: flex;
     align-items: center;
-    justify-content: space-evenly;
+    justify-content: center;
     gap: 20px;
-    padding: 0 40px;
-
-    /* align-items: center;
-    justify-content: space-between;
-    box-shadow: 0 -5px 20px rgba(0, 0, 0, 0.15);
-    z-index: 1000; */
 }
 
 .bottom-bar button {
     border: none;
     border-radius: 30px;
     padding: 12px 25px;
-    font-size: 16px;
+    font-size: 32px;
     font-weight: 600;
     cursor: pointer;
     transition: 0.3s ease;
 }
 
-/* Exit knop (klein en subtiel) */
-.btn-exit {
-    background: transparent;
-    color: white;
-    border: 2px solid var(--light-green);
-}
 
-.btn-exit:hover {
-    background: var(--light-green);
-    color: var(--dark-blue);
+/* Winkelmand knop */
+.btn-checkout:hover {
+    background: var(--light-orange);
 }
-
-/* Winkelmand knop (midden) */
-.btn-cart {
+.btn-checkout {
+    display: flex;              /* flex voor horizontale layout */
+    align-items: center;        /* verticaal centreren */
+    gap: 10px;                  /* ruimte tussen tekst en cirkel */
     background: var(--orange);
     color: white;
     font-size: 18px;
     padding: 14px 35px;
-}
-
-.btn-cart:hover {
-    background: var(--light-orange);
-}
-
-/* Checkout knop */
-.btn-checkout {
-    background: var(--green);
-    color: var(--dark-blue);
-}
-
-.btn-checkout:hover {
-    background: var(--light-green);
+    border-radius: 30px;
+    border: none;
+    cursor: pointer;
 }

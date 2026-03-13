@@ -6,19 +6,26 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Winkelmand</title>
     <link rel="stylesheet" href="assets/css/cart.css">
+    <link rel="icon" type="image/png" href="assets/logo's/logo-happy.png">
+
 </head>
 
 <body>
 
     <div class="cart-container">
-        <h1>🛒 Winkelmand</h1>
 
-        <div class="cart-items" id="cart-items">
+        <div class="cart-header">
+            <button class="back-btn" onclick="window.location.href='productPage.html'">
+                ← Terug naar producten
+            </button>
+
+            <h1>Winkelmand</h1>
         </div>
+
+        <div class="cart-items" id="cart-items"></div>
 
         <div class="cart-summary">
             <h2>Total: € <span id="total">0.00</span></h2>
-            <button class="checkout-btn">Bestelling afronden</button>
         </div>
 
     </div>
@@ -43,40 +50,38 @@
             cartItems.forEach((item, index) => {
 
                 const itemTotal = item.price * item.quantity;
-
                 total += itemTotal;
 
                 container.innerHTML += `
-                    <div class="cart-item">
+<div class="cart-item">
 
-                    <div class="item-info">
-                    <h3>${item.name}</h3>
-                    <p>€${item.price.toFixed(2)} per stuk</p>
-                    </div>
+<div class="item-info">
+<h3>${item.name}</h3>
+<p>€${item.price.toFixed(2)} per stuk</p>
+</div>
 
-                    <div class="item-controls">
-                    <button onclick="changeQuantity(${index},-1)">−</button>
-                    <span>${item.quantity}</span>
-                    <button onclick="changeQuantity(${index},1)">+</button>
-                    </div>
+<div class="item-controls">
+<button onclick="changeQuantity(${index},-1)">−</button>
+<span>${item.quantity}</span>
+<button onclick="changeQuantity(${index},1)">+</button>
+</div>
 
-                    <div class="item-total">
-                    €${itemTotal.toFixed(2)}
-                    </div>
+<div class="item-total">
+€${itemTotal.toFixed(2)}
+</div>
 
-                    <button class="remove-btn" onclick="removeItem(${index})">
-                    ✕
-                    </button>
+<button class="remove-btn" onclick="removeItem(${index})">
+✕
+</button>
 
-                    </div>
-                    `;
+</div>
+`;
 
             });
 
             totalEl.textContent = total.toFixed(2);
 
             saveCart();
-
         }
 
         function changeQuantity(index, amount) {
@@ -88,13 +93,11 @@
             }
 
             renderCart();
-
         }
 
         function removeItem(index) {
 
             cartItems.splice(index, 1);
-
             renderCart();
 
         }
@@ -104,12 +107,6 @@
     </script>
 
     <div class="bottom-bar">
-
-        <button class="btn-exit">Verlaat</button>
-
-        <button class="btn-cart" onclick="window.location.href='productPage.html'">
-            Doorgaan met bestellen
-        </button>
 
         <button class="btn-checkout" id="checkout-btn">
             Bestelling afronden
@@ -122,40 +119,259 @@
         document.getElementById("checkout-btn").addEventListener("click", checkout);
 
         async function checkout() {
+
             if (cartItems.length === 0) {
                 alert("Je winkelmand is leeg!");
                 return;
             }
 
             try {
+
                 const response = await fetch("./api/create_order.php", {
                     method: "POST",
                     headers: {
                         "Content-Type": "application/json"
                     },
-                    body: JSON.stringify({ items: cartItems })
+                    body: JSON.stringify({
+                        items: cartItems
+                    })
                 });
 
-                // response.json() maar één keer aanroepen
                 const data = await response.json();
 
                 console.log("API response:", data);
 
                 if (data.success) {
-                    alert("Bestelling geplaatst! Pickup nummer: " + data.pickup_number);
-                    sessionStorage.removeItem("cart"); // cart leegmaken
-                    window.location.href = "index.html"; // terug naar home
+
+                    // BON PRINTEN
+                    await printUSB(data.pickup_number);
+
+                    sessionStorage.setItem("pickupNumber", data.pickup_number);
+
+                    sessionStorage.removeItem("cart");
+
+                    window.location.href = "bedanktpage.php";
+
                 } else {
+
                     alert("Fout bij bestelling: " + (data.error || "Onbekend"));
+
                 }
 
             } catch (e) {
+
                 console.error("Checkout error:", e);
                 alert("Er ging iets mis bij het plaatsen van de bestelling");
+
             }
+
         }
+
     </script>
 
+    <script>
+
+        let selectedDevice = null;
+
+        const PRINTER_VENDORS = [
+            0x0483,
+            0x04b8,
+            0x0456,
+            0x067b
+        ];
+
+        async function autoDetectPrinter() {
+
+            try {
+
+                if (!navigator.usb) {
+                    throw new Error('WebUSB niet ondersteund');
+                }
+
+                const devices = await navigator.usb.getDevices();
+
+                const printer = devices.find(device =>
+                    PRINTER_VENDORS.includes(device.vendorId)
+                );
+
+                if (printer) {
+
+                    selectedDevice = printer;
+                    return true;
+
+                }
+
+                const filters = PRINTER_VENDORS.map(vendorId => ({ vendorId }));
+
+                selectedDevice = await navigator.usb.requestDevice({ filters });
+
+                return true;
+
+            } catch (error) {
+
+                console.error('Auto-detect Error:', error);
+                return false;
+
+            }
+
+        }
+
+        async function selectUSBDevice() {
+
+            const success = await autoDetectPrinter();
+
+            if (!success) {
+                alert("Geen printer geselecteerd");
+            }
+
+        }
+
+        async function printUSB(pickupNumber) {
+
+            try {
+
+                if (!selectedDevice) {
+
+                    await selectUSBDevice();
+
+                    if (!selectedDevice) return;
+
+                }
+
+                await selectedDevice.open();
+
+                if (selectedDevice.configuration === null) {
+                    await selectedDevice.selectConfiguration(1);
+                }
+
+                try {
+                    await selectedDevice.claimInterface(0);
+                } catch (e) { }
+
+                const encoder = new TextEncoder();
+
+                const receipt = buildReceipt(pickupNumber);
+
+                const intf = selectedDevice.configuration.interfaces[0].alternates[0];
+
+                const endpoint = intf.endpoints.find(e => e.direction === 'out');
+
+                await selectedDevice.transferOut(
+                    endpoint.endpointNumber,
+                    encoder.encode(receipt)
+                );
+
+                setTimeout(() => {
+                    selectedDevice.close();
+                }, 1000);
+
+            } catch (error) {
+
+                console.error('USB Print Error:', error);
+                alert("Printer fout: " + error.message);
+
+            }
+
+        }
+
+        async function printNetwork(pickupNumber) {
+
+            try {
+
+                const response = await fetch('xprint.php', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify({
+                        action: 'print',
+                        receipt: buildReceipt(pickupNumber)
+                    })
+                });
+
+                const data = await response.json();
+
+                if (!data.success) {
+                    alert("Printer fout: " + data.error);
+                }
+
+            } catch (error) {
+
+                console.error('Network Print Error:', error);
+
+            }
+
+        }
+
+        function buildReceipt(pickupNumber = "") {
+
+            let receipt = "";
+            let total = 0;
+
+            receipt += "\x1B\x40";
+            receipt += "\x1B\x61\x01";
+
+            receipt += "Happy Herbivore\n";
+
+            if (pickupNumber) {
+                receipt += "Pickup: #" + pickupNumber + "\n";
+            }
+
+            receipt += "\n";
+
+            receipt += "\x1B\x61\x00";
+
+            receipt += "--------------------------------\n";
+
+            cartItems.forEach(item => {
+
+                const itemTotal = item.price * item.quantity;
+
+                total += itemTotal;
+
+                let name = item.name;
+
+                if (name.length > 20) {
+                    name = name.substring(0, 20);
+                }
+
+                const line =
+                    item.quantity + "x " +
+                    name.padEnd(20, " ") +
+                    itemTotal.toFixed(2).padStart(8, " ");
+
+                receipt += line + "\n";
+
+            });
+
+            receipt += "--------------------------------\n";
+
+            receipt += "Totaal: " + total.toFixed(2) + " EUR\n";
+
+            const now = new Date();
+
+            receipt += "\n";
+            receipt += now.toLocaleString() + "\n";
+
+            receipt += "\nBedankt voor uw bestelling!\n";
+
+            receipt += "\n\n\n";
+
+            receipt += "\x1D\x56\x00";
+
+            return receipt;
+
+        }
+
+        window.addEventListener('load', () => {
+
+            if (navigator.usb) {
+                autoDetectPrinter();
+            }
+
+        });
+
+    </script>
 
 </body>
 

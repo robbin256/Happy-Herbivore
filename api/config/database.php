@@ -2,9 +2,9 @@
 class Database
 {
     private $host = "localhost";
-    private $db_name = "happyherbivore";
-    private $username = "root";
-    private $password = "";
+    private $db_name = "u241141_Herbivore";
+    private $username = "u241141_Herbivore";
+    private $password = "SKu9Rn2feVQkVY6NjcF7";
     public $conn;
 
     public function getConnection()

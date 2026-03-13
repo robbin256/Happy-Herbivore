@@ -20,7 +20,20 @@ $images_json = json_encode($images);
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Bedankt voor je bestelling - Happy Herbivore</title>
+    <link rel="icon" type="image/png" href="assets/logo's/logo-happy.png">
     <style>
+        @font-face {
+            font-family: 'RenosRough';
+            src: url('../fonts/Renos-Rough.ttf') format('truetype');
+            font-weight: normal;
+            font-style: normal;
+        }
+
+        * {
+            font-family: 'RenosRough';
+        }
+
+
         body,
         html {
             margin: 0;
@@ -100,12 +113,12 @@ $images_json = json_encode($images);
         }
 
         h1 {
+            color: white;
             font-size: 72px;
             font-weight: 800;
             margin: 0 0 30px 0;
             background: linear-gradient(135deg, #2ed573, #7bed9f);
-            -webkit-background-clip: text;
-            -webkit-text-fill-color: transparent;
+            /* -webkit-background-clip: text; */
             text-transform: uppercase;
             letter-spacing: 2px;
         }
@@ -196,10 +209,18 @@ $images_json = json_encode($images);
 
         <div class="message-box">
             <div class="check-icon">✓</div>
-            <h1>Bedankt!</h1>
+            <h1 id="pickup-number"></h1>
             <p>Eet smakelijk, je bestelling<br>wordt nu klaargemaakt.</p>
         </div>
     </div>
+
+    <script>
+        const pickupNumber = sessionStorage.getItem("pickupNumber");
+
+        if (pickupNumber) {
+            document.getElementById("pickup-number").textContent = "uw bestelnummer is: " + pickupNumber;
+        }
+    </script>
 
     <div class="timer-bar"></div>
 
@@ -230,7 +251,7 @@ $images_json = json_encode($images);
 
         // Automatisch terug naar de idle page na 10 seconden
         setTimeout(() => {
-            window.location.href = 'idlepage.php';
+            window.location.href = 'index.php';
         }, 10000);
     </script>
 </body>

@@ -13,7 +13,6 @@
     font-style: normal;
 }
 
-
 /* =========================
    ROOT VARIABLES
 ========================= */
@@ -30,6 +29,9 @@
     --text-dark: #053631;
     --text-light: #666;
 }
+*{
+    font-family: 'RenosRough';
+}
 
 /* Chrome, Edge, Safari */
 body::-webkit-scrollbar {
@@ -39,6 +41,7 @@ body::-webkit-scrollbar {
 /* Firefox */
 body {
     scrollbar-width: none;
+
 }
 
 /* IE & oude Edge */
@@ -64,6 +67,29 @@ body {
     background-color: var(--bg);
     color: var(--text-dark);
     display: flex;
+}
+
+#cart-popup {
+    position: fixed;
+    top: 50%;
+    left: calc(50% + 120px);
+    transform: translate(-50%, -50%) scale(0.8);
+    background: var(--light-green);
+    color: white;
+    padding: 20px 30px;
+    border-radius: 12px;
+    font-weight: bold;
+    opacity: 0;
+    pointer-events: none;
+    transition: opacity 0.3s ease, transform 0.3s ease;
+    z-index: 9999;
+    text-align: center;
+    right: 120px;
+}
+
+#cart-popup.show {
+    opacity: 1;
+    transform: translate(-50%, -50%) scale(1);
 }
 
 
@@ -185,7 +211,8 @@ header h1 {
 }
 
 .image-container {
-    height: 200px;
+    width: 100%;
+    aspect-ratio: 4/3; /* of 1/1 voor vierkant */
     position: relative;
     overflow: hidden;
 }
@@ -244,61 +271,54 @@ header h1 {
 .bottom-bar {
     position: fixed;
     bottom: 0;
-    /* left: 240px; zelfde als sideMenu width */
-    /* width: calc(100% - 240px); */
     width: 100%;
-    height: 80px;
+    height: 160px;
     background: var(--dark-blue);
     display: flex;
     align-items: center;
-    justify-content: space-between;
-    padding: 0 40px;
-    box-shadow: 0 -5px 20px rgba(0,0,0,0.15);
-    z-index: 1000;
+    justify-content: center;
+    gap: 20px;
 }
 
-.bottom-bar .btn-cart, .btn-exit, .btn-checkout {
+.bottom-bar button {
     border: none;
     border-radius: 30px;
     padding: 12px 25px;
-    font-size: 16px;
+    font-size: 32px;
     font-weight: 600;
     cursor: pointer;
     transition: 0.3s ease;
 }
 
-/* Exit knop (klein en subtiel) */
-.btn-exit {
-    background: transparent;
-    color: white;
-    border: 2px solid var(--light-green);
-}
 
-.btn-exit:hover {
-    background: var(--light-green);
-    color: var(--dark-blue);
+/* Winkelmand knop */
+.btn-cart:hover {
+    background: var(--light-orange);
 }
-
-/* Winkelmand knop (midden) */
 .btn-cart {
+    display: flex;              /* flex voor horizontale layout */
+    align-items: center;        /* verticaal centreren */
+    gap: 10px;                  /* ruimte tussen tekst en cirkel */
     background: var(--orange);
     color: white;
     font-size: 18px;
     padding: 14px 35px;
+    border-radius: 30px;
+    border: none;
+    cursor: pointer;
 }
 
-.btn-cart:hover {
-    background: var(--light-orange);
-}
-
-/* Checkout knop */
-.btn-checkout {
-    background: var(--green);
-    color: var(--dark-blue);
-}
-
-.btn-checkout:hover {
-    background: var(--light-green);
+.cart-count {
+    display: flex;              /* flex voor centreren nummer */
+    justify-content: center;
+    align-items: center;
+    width: 40px;                /* vaste breedte */
+    height: 40px;               /* vaste hoogte */
+    background: red;
+    color: white;
+    font-size: 18px;
+    font-weight: bold;
+    border-radius: 50%;         /* perfect rond */
 }
 
 /* =========================
@@ -317,22 +337,7 @@ header h1 {
 ========================= */
 
 @media (max-width: 900px) {
-    /* .sideMenu {
-        position: relative;
-        width: 100%;
-        height: auto;
-    } */
-
-    /* .container {
-        margin-left: 0;
-        padding: 30px;
-    } */
-
-    /* body {
-        flex-direction: column;
-    } */
-
-    .product-grid {
+.product-grid {
     display: grid;
     grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
     gap: 30px;
